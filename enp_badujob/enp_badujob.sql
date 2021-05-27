@@ -18,4 +18,5 @@ INSERT INTO `job_grades` (job_name, grade, name, label, salary, skin_male, skin_
 	('badu',0,'empleado','Reponedor',20,'{}','{}'),
 	('badu',1,'empleado','Cajero',40,'{}','{}'),
 	('badu',2,'empleado','Encargado',60,'{}','{}'),
-	('badu',3,'boss','Dueño',85,'{}','{}'),
+	('badu',3,'boss','Dueño',85,'{}','{}')
+;
