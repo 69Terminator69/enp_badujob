@@ -6,7 +6,7 @@ RegisterServerEvent('enp_badujob:shop:buy')
 AddEventHandler('enp_badujob:shop:buy', function(item, cantidad, price)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	if(xPlayer.getMoney() >= price) then
-		xPlayer.removeMoney(price)
+		-- xPlayer.removeMoney(price)
 		xPlayer.addInventoryItem(item, cantidad)
 	end
 end)
