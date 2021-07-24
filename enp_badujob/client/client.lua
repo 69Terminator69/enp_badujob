@@ -40,7 +40,7 @@ Citizen.CreateThread(function()
                 end
             end
 
-            if playerInService then
+            --if playerInService then
                 
                 local shop = { x = -705.72, y = -915.43, z = 19.22}
                 local dist_shop = Vdist(playerCoords, shop.x, shop.y, shop.z, true)
@@ -49,6 +49,7 @@ Citizen.CreateThread(function()
                     _msec = 0
                     Draw3DText( shop.x, shop.y, shop.z, "Tienda\n~c~Pulsa ~r~[E]~c~ para abrir la nevera")
                     if dist_shop <= 1.5 and IsControlJustPressed(0, 38) then
+                        ExecuteCommand('me Abre la nevera')
                         OpenShopMenu()
                     end
                 end
@@ -79,6 +80,7 @@ Citizen.CreateThread(function()
                     _msec = 0
                     Draw3DText( armory.x, armory.y, armory.z, "Almacén\n~c~Pulsa ~r~[E]~c~ para abrir el almacén")
                     if dist_armory <= 1.5 and IsControlJustPressed(0, 38) then
+                        ExecuteCommand('me Mete la llave y abre la puerta')
                         OpenArmoryMenu()
                     end
                 end
@@ -87,16 +89,19 @@ Citizen.CreateThread(function()
                 local boss = { x = -709.65, y = -905.26, z = 19.22}
                 local dist_boss = Vdist(playerCoords, boss.x, boss.y, boss.z, true)
             
-                if PlayerData.job and PlayerData.job.name == 'badu' and PlayerData.job.grade >= 3 then
+                if PlayerData.job and PlayerData.job.name == 'badu' and PlayerData.job.grade_name == 'boss' then
                     if dist_boss < 3 then
                         _msec = 0
                         Draw3DText( boss.x, boss.y, boss.z, "Despacho\n~c~Pulsa ~r~[E]~c~ para encender el ordenador")
                         if dist_boss <= 1.5 and IsControlJustPressed(0, 38) then
+                            ExecuteCommand('me Enciende el ordenador y mira la lista de empleados')
                             OpenBossMenu()
                         end
                     end
                 end
-            end
+
+                
+           -- end
         end 
 
 
@@ -104,15 +109,37 @@ Citizen.CreateThread(function()
     end
 end)
 
-function IsJobBadu()
-	if PlayerData ~= nil then
-		local isJobbadu = false
-		if PlayerData.job.name ~= nil and PlayerData.job.name == 'badu' then
-			isJobbadu = true
-		end
-		return isJobbadu
-	end
+RegisterKeyMapping('MenuBadu', 'Menu Badulaque', 'keyboard', 'F6')
+RegisterCommand('MenuBadu', function()
+    if PlayerData.job and PlayerData.job.name == 'badu' then
+        OpenMobileMenu()
+    end
+end)
+function OpenMobileMenu()
+	ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'facturas', {
+        title = 'Facturas'
+    }, function(data, menu)
+
+        local amount = tonumber(data.value)
+        if amount == nil then
+            ESX.ShowNotification('Cantidad invalida')
+        else
+            menu.close()
+            local closestPlayer, closestDistance = ESX.Game.GetClosestPlayer()
+            if closestPlayer == -1 or closestDistance > 3.0 then
+                ESX.ShowNotification('No hay nadie cerca')
+            else
+                TriggerServerEvent('esx_billing:sendBill', GetPlayerServerId(closestPlayer), 'society_Badu', 'Badulaque', amount)
+                ESX.ShowNotification('Factura emitada')
+            end
+
+        end
+
+    end, function(data, menu)
+        menu.close()
+    end)
 end
+
 
 Draw3DText = function( x, y, z, text )
     local onScreen, _x, _y = World3dToScreen2d( x, y, z )
@@ -146,8 +173,9 @@ OpenTaquilla = function()
         local playerPed = PlayerPedId()
 
         if value == 'citizen_wear' then 
-            if playerInService then 
-                playerInService = false
+           -- if playerInService then 
+              --  playerInService = false
+                ExecuteCommand('me Abre la taquilla y se pone su ropa')
                 ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
                     local model = nil
           
@@ -170,10 +198,11 @@ OpenTaquilla = function()
                     TriggerEvent('esx:restoreLoadout')
                 end)
                 menu.close()
-            end
+           -- end
         elseif value == 'uniform' then 
-            if not playerInService then
-                playerInService = true
+           -- if not playerInService then
+                ExecuteCommand('me Abre la taquilla y se pone la ropa de trabajo')
+            --    playerInService = true
                 ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
 
                     if skin.sex == 0 then
@@ -214,7 +243,7 @@ OpenTaquilla = function()
                     end
                 end)
                 menu.close()
-            end
+           -- end
         end
     end, function(data, menu)
         menu.close()
@@ -404,6 +433,5 @@ end
 OpenBossMenu = function()
     TriggerEvent('esx_society:openBossMenu', 'badu', function(data, menu)
         menu.close()
-        align    = 'bottom-right'
     end, { wash = false })
 end
