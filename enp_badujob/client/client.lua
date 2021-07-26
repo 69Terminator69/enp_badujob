@@ -21,6 +21,16 @@ AddEventHandler('esx:setJob', function(job)
     PlayerData.job = job
 end)
 
+RegisterNetEvent('enp_badujob:sociedad')
+AddEventHandler('enp_badujob:sociedad', function()
+    if PlayerData.job.grade_name == 'boss' then
+        TriggerEvent('esx_society:openBossMenu', 'badu', function(data, menu)
+            menu.close()
+            align    = 'bottom-right'
+        end, { wash = false })
+    end
+end)
+
 Citizen.CreateThread(function()
     while true do
         local _msec = 250
@@ -95,7 +105,7 @@ Citizen.CreateThread(function()
                         Draw3DText( boss.x, boss.y, boss.z, "Despacho\n~c~Pulsa ~r~[E]~c~ para encender el ordenador")
                         if dist_boss <= 1.5 and IsControlJustPressed(0, 38) then
                             ExecuteCommand('me Enciende el ordenador y mira la lista de empleados')
-                            OpenBossMenu()
+                            TriggerEvent('enp_badujob)
                         end
                     end
                 end
@@ -430,8 +440,3 @@ OpenGetStocksMenu = function()
 	end)
 end
 
-OpenBossMenu = function()
-    TriggerEvent('esx_society:openBossMenu', 'badu', function(data, menu)
-        menu.close()
-    end, { wash = false })
-end
